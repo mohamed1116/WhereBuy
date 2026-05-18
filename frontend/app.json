@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Wherebuy",
+    "slug": "wherebuy-taroudant",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "android": {
+      "usesCleartextTraffic": true
+    }
+  }
+}
