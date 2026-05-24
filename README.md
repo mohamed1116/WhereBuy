@@ -1,88 +1,75 @@
-# WhereBuy
-WhereBuy – a full‑stack mobile app that helps users find local stores in Taroudant, Morocco. Built with React Native (Expo) and Express.
-# Wherebuy — Taroudant
+# WhereBuy — Trouvez où acheter à Taroudant
 
-A mobile app that helps residents of Taroudant find **where to buy a specific product** in the city.
+Application mobile full-stack (React Native + Express) qui permet aux habitants de Taroudant de trouver facilement où acheter un produit en ville.
 
----
+## Fonctionnalites
 
-## What the app does
+- Rechercher un produit par nom
+- Afficher la liste des magasins qui vendent ce produit
+- Visualiser une image du produit (depuis une URL)
+- Noter les magasins (1 a 5 etoiles)
+- Ajouter des magasins aux favoris
+- Ajouter un nouveau magasin pour un produit existant
+- Voir une carte simplifiee de Taroudant (WebView)
 
-- Search for a product and find the stores that sell it
-- Display product images from a URL
-- Show store location on a map
-- Rate stores with stars
-- Add stores to favorites
-- Add, edit, and delete products
+## Structure du projet
 
----
-
-## Project structure
-
-```
 pro/
 ├── backend/
-│   └── server.js        ← Server (Express + Node.js)
+│   └── server.js            Serveur Express (API, stockage en memoire)
 │
 └── frontend/
-    ├── App.js           ← Navigation setup
+    ├── App.js               Navigation principale
     └── screens/
-        ├── AuthScreen.js        ← Login / Register
-        ├── HomeScreen.js        ← Home screen
-        ├── StoresScreen.js      ← Product details & stores
-        ├── AddProductScreen.js  ← Add a product
-        ├── EditProductScreen.js ← Edit a product
-        ├── MapScreen.js         ← Map view
-        ├── PickLocationScreen.js← Pick a location on the map
-        └── FavoritesScreen.js   ← Favorites
-```
+        ├── AuthScreen.js        Connexion / Inscription
+        ├── HomeScreen.js        Accueil (liste des produits, recherche)
+        ├── StoresScreen.js      Detail d un produit + magasins associes
+        ├── AddStoreScreen.js    Ajouter un magasin
+        ├── MapScreen.js         Carte simple (WebView)
+        └── FavoritesScreen.js   Liste des favoris
 
----
+## Lancer le projet
 
-## Running the project
-
-**Terminal 1 — Backend:**
-```bash
+Terminal 1 - Backend :
 cd backend
 node server.js
-```
 
-**Terminal 2 — Frontend:**
-```bash
+Terminal 2 - Frontend :
 cd frontend
-npm run web        # browser
-npx expo start     # mobile via Expo Go
-```
+npm run web        navigateur
+npx expo start     mobile via Expo Go
 
----
+## Identifiants de test
 
-## Login credentials
+Champ      Valeur
+username   admin
+password   1234
 
-| Field | Value |
-|-------|-------|
-| username | `admin` |
-| password | `1234` |
+## Adresse IP du backend
 
----
+Si vous changez de reseau Wi-Fi, l adresse IP de votre ordinateur change.
 
-## Changing the IP address
+Dans chaque ecran, modifiez la ligne suivante :
 
-If you switch Wi-Fi networks, update this line in every screen file:
-
-```js
 const URL = "http://192.168.4.103:3000";
-```
 
-To get your new IP: open `cmd` and type `ipconfig`
+Remplacez 192.168.4.103 par votre nouvelle IP (obtenue avec ipconfig sous Windows ou ifconfig sous Mac/Linux).
 
----
+## Technologies utilisees
 
-## Tech stack
+- Frontend : React Native (Expo)
+- Backend : Node.js + Express
+- Requetes HTTP : Axios
+- Carte : WebView (Google Maps / lien statique)
+- Stockage : tableaux JavaScript en memoire (pas de base de donnees)
 
-| Part | Technology |
-|------|------------|
-| Frontend | React Native + Expo |
-| Backend | Node.js + Express |
-| HTTP | Axios |
-| Maps | Leaflet (WebView) + Google Maps (Web) |
-| Data | In-memory arrays (no database) |
+## Remarque
+
+L application ne stocke aucune donnee de facon permanente (pas de base de donnees).
+Les produits sont predefinis (telephone, livre, velo).
+Les utilisateurs peuvent ajouter des magasins et les noter, mais ils ne peuvent ni ajouter ni modifier des produits (choix pedagogique pour rester dans le cadre du cours).
+
+## Auteur
+
+Projet realise dans le cadre du cours de programmation full-stack.
+Etudiant : Mohamed (github.com/mohamed1116)
