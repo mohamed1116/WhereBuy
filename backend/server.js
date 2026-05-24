@@ -10,37 +10,30 @@ app.use(express.json());
 let users = [
   { id: 1, username: "admin", password: "1234" }
 ];
-
 let products = [
   {
     id: 1,
     name: "Telephone",
-    image: "https://cdn-icons-png.flaticon.com/512/0/191.png",
+    image: "https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg",
     storeName: "Magasin Atlas",
     storeAddress: "Rue Moulay Ismail, Taroudant",
-    info: "Smartphones et accessoires",
-    latitude: 30.4727,
-    longitude: -8.8746
+    info: "Smartphones et accessoires"
   },
   {
     id: 2,
     name: "Livre",
-    image: "https://cdn-icons-png.flaticon.com/512/29/29302.png",
+    image: "https://images.pexels.com/photos/2846814/pexels-photo-2846814.jpeg",
     storeName: "Librairie Al Amal",
     storeAddress: "Place Assarag, Taroudant",
-    info: "Livres scolaires et romans",
-    latitude: 30.4712,
-    longitude: -8.8761
+    info: "Livres scolaires et romans"
   },
   {
     id: 3,
     name: "Velo",
-    image: "https://cdn-icons-png.flaticon.com/512/2972/2972185.png",
+    image: "https://images.pexels.com/photos/100582/pexels-photo-100582.jpeg",
     storeName: "Velos Taroudant",
     storeAddress: "Hay Salam, Taroudant",
-    info: "Velos et pieces detachees",
-    latitude: 30.4698,
-    longitude: -8.8712
+    info: "Velos et pieces detachees"
   }
 ];
 
@@ -54,260 +47,98 @@ let stores = [
 let favorites = [];
 
 let nextUserId    = 2;
-let nextProductId = 4;
 let nextStoreId   = 5;
 let nextFavId     = 1;
 
-// calcule la moyenne des notes
 function moyenne(ratings) {
   if (ratings.length === 0) return 0;
   let total = 0;
-  for (let i = 0; i < ratings.length; i++) {
-    total = total + ratings[i];
-  }
+  for (let i = 0; i < ratings.length; i++) total += ratings[i];
   return parseFloat((total / ratings.length).toFixed(1));
 }
 
 // ---------- inscription ----------
-
-app.post("/register", function(req, res) {
-  let username = req.body.username;
-  let password = req.body.password;
-
-  if (!username || !password) {
-    return res.status(400).json({ error: "username et password sont requis" });
-  }
-
-  let existe = users.find(function(u) { return u.username === username; });
-  if (existe) {
-    return res.status(409).json({ error: "Ce nom d'utilisateur existe deja" });
-  }
-
-  let newUser = { id: nextUserId, username: username, password: password };
-  nextUserId = nextUserId + 1;
+app.post("/register", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: "username et password requis" });
+  if (users.find(u => u.username === username)) return res.status(409).json({ error: "Utilisateur existe deja" });
+  const newUser = { id: nextUserId++, username, password };
   users.push(newUser);
-
   res.status(201).json({ id: newUser.id, username: newUser.username });
 });
 
 // ---------- connexion ----------
-
-app.post("/login", function(req, res) {
-  let username = req.body.username;
-  let password = req.body.password;
-
-  let user = users.find(function(u) {
-    return u.username === username && u.password === password;
-  });
-
-  if (!user) {
-    return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
-  }
-
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) return res.status(401).json({ error: "Identifiants incorrects" });
   res.json({ id: user.id, username: user.username });
 });
 
-// ---------- produits ----------
-
-// lister / chercher
-app.get("/products", function(req, res) {
-  let search = req.query.search;
-
+// ---------- produits (lecture seule) ----------
+app.get("/products", (req, res) => {
+  const search = req.query.search;
   if (search) {
-    let resultat = products.filter(function(p) {
-      return p.name.toLowerCase().includes(search.toLowerCase());
-    });
-    return res.json(resultat);
+    const result = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+    return res.json(result);
   }
-
   res.json(products);
 });
 
-// ajouter un produit
-app.post("/products", function(req, res) {
-  let name         = req.body.name;
-  let image        = req.body.image        || "";
-  let storeName    = req.body.storeName    || "";
-  let storeAddress = req.body.storeAddress || "";
-  let info         = req.body.info         || "";
-  let latitude     = req.body.latitude     || null;
-  let longitude    = req.body.longitude    || null;
-
-  if (!name) {
-    return res.status(400).json({ error: "Le nom est requis" });
-  }
-
-  let newProduct = {
-    id:           nextProductId,
-    name:         name,
-    image:        image,
-    storeName:    storeName,
-    storeAddress: storeAddress,
-    info:         info,
-    latitude:     latitude,
-    longitude:    longitude
-  };
-  nextProductId = nextProductId + 1;
-  products.push(newProduct);
-
-  res.status(201).json(newProduct);
-});
-
-// modifier un produit
-app.put("/products/:id", function(req, res) {
-  let id = parseInt(req.params.id);
-
-  let product = products.find(function(p) { return p.id === id; });
-  if (!product) {
-    return res.status(404).json({ error: "Produit introuvable" });
-  }
-
-  // on met a jour seulement les champs envoyes
-  if (req.body.name         !== undefined) product.name         = req.body.name;
-  if (req.body.image        !== undefined) product.image        = req.body.image;
-  if (req.body.storeName    !== undefined) product.storeName    = req.body.storeName;
-  if (req.body.storeAddress !== undefined) product.storeAddress = req.body.storeAddress;
-  if (req.body.info         !== undefined) product.info         = req.body.info;
-  if (req.body.latitude     !== undefined) product.latitude     = req.body.latitude;
-  if (req.body.longitude    !== undefined) product.longitude    = req.body.longitude;
-
-  res.json(product);
-});
-
-// supprimer un produit
-app.delete("/products/:id", function(req, res) {
-  let id    = parseInt(req.params.id);
-  let index = products.findIndex(function(p) { return p.id === id; });
-
-  if (index === -1) {
-    return res.status(404).json({ error: "Produit introuvable" });
-  }
-
-  products.splice(index, 1);
-  res.json({ success: true });
-});
-
 // ---------- magasins ----------
-
-app.get("/stores/:productId", function(req, res) {
-  let productId = parseInt(req.params.productId);
-
-  let result = stores.filter(function(s) {
-    return s.productId === productId;
-  });
-
-  let resultAvecNote = result.map(function(s) {
-    return {
-      id:        s.id,
-      productId: s.productId,
-      name:      s.name,
-      address:   s.address,
-      phone:     s.phone,
-      ratings:   s.ratings,
-      rating:    moyenne(s.ratings)
-    };
-  });
-
-  res.json(resultAvecNote);
-});
-
-app.post("/stores", function(req, res) {
-  let productId = req.body.productId;
-  let name      = req.body.name;
-  let address   = req.body.address;
-  let phone     = req.body.phone;
-  let userId    = req.body.userId;
-
-  if (!productId || !name || !address || !phone) {
-    return res.status(400).json({ error: "productId, name, address et phone sont requis" });
-  }
-
-  let newStore = {
-    id:        nextStoreId,
-    productId: productId,
-    name:      name,
-    address:   address,
-    phone:     phone,
-    ratings:   [],
-    userId:    userId
-  };
-  nextStoreId = nextStoreId + 1;
-  stores.push(newStore);
-
-  res.status(201).json({ ...newStore, rating: 0 });
-});
-
-app.put("/stores/:storeId/rate", function(req, res) {
-  let storeId = parseInt(req.params.storeId);
-  let rating  = parseInt(req.body.rating);
-
-  let store = stores.find(function(s) { return s.id === storeId; });
-  if (!store) {
-    return res.status(404).json({ error: "Magasin introuvable" });
-  }
-
-  if (!rating || rating < 1 || rating > 5) {
-    return res.status(400).json({ error: "La note doit etre entre 1 et 5" });
-  }
-
-  store.ratings.push(rating);
-
-  res.json({
-    id:        store.id,
-    productId: store.productId,
-    name:      store.name,
-    address:   store.address,
-    phone:     store.phone,
-    ratings:   store.ratings,
-    rating:    moyenne(store.ratings)
-  });
-});
-
-// ---------- favoris ----------
-
-app.get("/favorites/:userId", function(req, res) {
-  let userId = parseInt(req.params.userId);
-  let result = favorites.filter(function(f) { return f.userId === userId; });
+app.get("/stores/:productId", (req, res) => {
+  const productId = parseInt(req.params.productId);
+  const result = stores.filter(s => s.productId === productId).map(s => ({
+    ...s,
+    rating: moyenne(s.ratings)
+  }));
   res.json(result);
 });
 
-app.post("/favorites", function(req, res) {
-  let userId    = req.body.userId;
-  let storeId   = req.body.storeId;
-  let storeName = req.body.storeName;
+app.post("/stores", (req, res) => {
+  const { productId, name, address, phone, userId } = req.body;
+  if (!productId || !name || !address || !phone) return res.status(400).json({ error: "Champs requis" });
+  const newStore = { id: nextStoreId++, productId, name, address, phone, ratings: [], userId };
+  stores.push(newStore);
+  res.status(201).json({ ...newStore, rating: 0 });
+});
 
-  if (!userId || !storeId || !storeName) {
-    return res.status(400).json({ error: "userId, storeId et storeName sont requis" });
-  }
+app.put("/stores/:storeId/rate", (req, res) => {
+  const storeId = parseInt(req.params.storeId);
+  const rating = parseInt(req.body.rating);
+  const store = stores.find(s => s.id === storeId);
+  if (!store) return res.status(404).json({ error: "Magasin introuvable" });
+  if (rating < 1 || rating > 5) return res.status(400).json({ error: "Note entre 1 et 5" });
+  store.ratings.push(rating);
+  res.json({ ...store, rating: moyenne(store.ratings) });
+});
 
-  let existe = favorites.find(function(f) {
-    return f.userId === userId && f.storeId === storeId;
-  });
-  if (existe) {
+// ---------- favoris ----------
+app.get("/favorites/:userId", (req, res) => {
+  const userId = parseInt(req.params.userId);
+  const result = favorites.filter(f => f.userId === userId);
+  res.json(result);
+});
+
+app.post("/favorites", (req, res) => {
+  const { userId, storeId, storeName } = req.body;
+  if (!userId || !storeId || !storeName) return res.status(400).json({ error: "Champs requis" });
+  if (favorites.find(f => f.userId === userId && f.storeId === storeId))
     return res.status(409).json({ error: "Deja dans les favoris" });
-  }
-
-  let newFav = { id: nextFavId, userId: userId, storeId: storeId, storeName: storeName };
-  nextFavId = nextFavId + 1;
+  const newFav = { id: nextFavId++, userId, storeId, storeName };
   favorites.push(newFav);
-
   res.status(201).json(newFav);
 });
 
-app.delete("/favorites/:id", function(req, res) {
-  let id    = parseInt(req.params.id);
-  let index = favorites.findIndex(function(f) { return f.id === id; });
-
-  if (index === -1) {
-    return res.status(404).json({ error: "Favori introuvable" });
-  }
-
+app.delete("/favorites/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = favorites.findIndex(f => f.id === id);
+  if (index === -1) return res.status(404).json({ error: "Favori introuvable" });
   favorites.splice(index, 1);
   res.json({ success: true });
 });
 
 // ---------- demarrage ----------
-
-app.listen(3000, "0.0.0.0", function() {
+app.listen(3000, "0.0.0.0", () => {
   console.log("Serveur demarre sur http://0.0.0.0:3000");
 });

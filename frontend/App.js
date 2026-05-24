@@ -1,13 +1,11 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AddStoreScreen from "./screens/AddStoreScreen";
 
 import AuthScreen          from "./screens/AuthScreen";
 import HomeScreen          from "./screens/HomeScreen";
 import StoresScreen        from "./screens/StoresScreen";
-import AddProductScreen    from "./screens/AddProductScreen";
-import EditProductScreen   from "./screens/EditProductScreen";
-import PickLocationScreen  from "./screens/PickLocationScreen";
 import MapScreen           from "./screens/MapScreen";
 import FavoritesScreen     from "./screens/FavoritesScreen";
 
@@ -27,9 +25,7 @@ export default function App() {
         <Stack.Screen name="Auth"         component={AuthScreen}         options={{ headerShown: false }} />
         <Stack.Screen name="Home"         component={HomeScreen}         options={{ title: "Wherebuy - Taroudant" }} />
         <Stack.Screen name="Stores"       component={StoresScreen}       options={function({ route }) { return { title: route.params.product.name }; }} />
-        <Stack.Screen name="AddProduct"   component={AddProductScreen}   options={{ title: "Ajouter un produit" }} />
-        <Stack.Screen name="EditProduct"  component={EditProductScreen}  options={{ title: "Modifier le produit" }} />
-        <Stack.Screen name="PickLocation" component={PickLocationScreen} options={{ title: "Choisir un emplacement" }} />
+        <Stack.Screen name="AddStore" component={AddStoreScreen} options={{ title: "Ajouter un magasin" }} />
         <Stack.Screen name="Map"          component={MapScreen}          options={{ title: "Carte" }} />
         <Stack.Screen name="Favorites"    component={FavoritesScreen}    options={{ title: "Mes Favoris" }} />
       </Stack.Navigator>
