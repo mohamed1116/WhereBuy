@@ -27,6 +27,7 @@ pro/
         ├── AddStoreScreen.js    Ajouter un magasin
         ├── MapScreen.js         Carte simple (WebView)
         └── FavoritesScreen.js   Liste des favoris
+        
 
 ## Lancer le projet
 
